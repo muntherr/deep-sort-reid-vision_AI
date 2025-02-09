@@ -1,0 +1,132 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+yolo11n.pt
+*/yolo11n.pt
+*_cache.json
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environment
+venv/
+ENV/
+env/
+.venv/
+
+# pipenv
+Pipfile.lock
+
+# pyenv
+.python-version
+
+# Poetry
+poetry.lock
+
+# tox
+.tox/
+.nox/
+
+# Pyre type checker
+.pyre/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.env.*
+.venv
+
+# Editor directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# mypy
+.mypy_cache/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+
+# Coverage reports
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+
+# PyCharm
+.idea/
+
+# Local cache files
+*.log
+
+# FastAPI specific
+*.sqlite3
+*.db
+
+# Docker specific
+.dockerignore
+Dockerfile
+docker-compose.yml
+
+# Ignore all local test databases
+test.db
+
+# Logs and debug files
+*.log
+*.pot
+*.mo
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+.pnp.*
+.pnp/
+
+# VSCode Extensions
+.vscode-server/
+
+# Miscellaneous
+!.gitignore

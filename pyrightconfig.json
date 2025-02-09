@@ -1,0 +1,5 @@
+{
+    "exclude": [
+        "deep_sort_reid/torchreid",
+    ]
+}
