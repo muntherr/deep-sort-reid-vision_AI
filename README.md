@@ -5,6 +5,10 @@
 
 *API Docs is not yet available, but it's on the way!* 
 
+## Navigation
+[Introduction](#introduction)
+[Quick Start](#quick-start)
+
 ## Introduction
 Deep Sort ReID is an adaption of the prominent 'Deep Sort' Algorithm introduced in 2017, through the following [repo](https://github.com/nwojke/deep_sort) and [paper](https://arxiv.org/pdf/1703.07402). After all these years, Deep Sort still stand out today as a relative simple, modular, lightweight and efficient tracking algorithm. Unfortunately, the original implementation has been abandoned for many years, and usually requires some customisation to make it work with a modern versions of Python and its dependencies. 
 
