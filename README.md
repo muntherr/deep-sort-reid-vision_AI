@@ -5,9 +5,8 @@
 
 *API Docs is not yet available, but it's on the way!* 
 
-## Navigation
+**Navigation**
 - [Deep Sort ReID](#deep-sort-reid)
-  - [Navigation](#navigation)
   - [Introduction](#introduction)
   - [Quick Start](#quick-start)
 
