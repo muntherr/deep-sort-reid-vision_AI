@@ -166,16 +166,16 @@ class Tracker():
         highest_similarity_track_idx = -1
 
         for track_idx, track in enumerate(tracks):
-            last_track_feature = None 
+            track_samples = None
 
             if track.track_id in self.cache_storage.samples:
-                # Currently grabs the oldest sample, here we could get more creative
-                # and take a random sample, or even create a mean vector from all the available samples
-                last_track_feature = self.cache_storage[track.track_id][0]
+                track_samples = self.cache_storage[track.track_id]
 
-            if (last_track_feature is not None and detection.feature is not None):
-                similarity_score = GatedMetric.similarity(
-                    last_track_feature, detection.feature)
+            if (track_samples is not None and detection.feature is not None):
+                # 1 - in order to transform it back to similarity from distance
+                # Should be setup to work with euclidean distance likewise
+                similarity_score = (1 - GatedMetric.cosine_distance(
+                    track_samples, [detection.feature])).item()
 
                 if similarity_score > highest_similarity_score:
                     highest_similarity_score = similarity_score
@@ -251,7 +251,7 @@ class Tracker():
 
         matches_track_det_idx: List[Tuple[int, int]] = []
         unmatched_detections_idx: List[int] = detections_idx
-        
+
         # Note that we start from tracks of age 1 (frame)
         for age in range(1, self.max_since_update):
             if len(detections_idx) == 0:
