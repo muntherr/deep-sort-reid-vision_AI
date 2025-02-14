@@ -56,12 +56,14 @@ def extract_features_resnet(file_input_path: str,
                 cropped_img).unsqueeze(0)).to(device)
             batch.append(model_input)
 
-        batch = torch.cat(batch)
-        object_features: Tensor = (feature_extractor(batch))
-
         features = []
-        for feature in object_features:
-            features.append((feature.detach()).flatten())
+        if batch:
+            batch = torch.cat(batch)
+            object_features: Tensor = (feature_extractor(batch))
+
+            for feature in object_features:
+                features.append((feature.detach()).flatten())
+
         frames_features.append(features)
         frame_idx += 1
 
