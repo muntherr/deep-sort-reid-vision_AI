@@ -13,12 +13,12 @@ def parse_requirements(filename):
 
 setup(
     name="deep_sort_reid",  # Your project name
-    version="0.1.1",  # Your project version
+    version="0.1.2",  # Your project version
     description="A re-mastered version of the original Deep Sort implementation, with added functionalities such as re-identification.",
     long_description=long_description,
     long_description_content_type="text/markdown",  # If you have README.md
-    url="https://github.com/yourusername/my_project",  # URL of your project repo
-    author="Your Name",
+    url="https://github.com/cajmorgan/deep_sort_reid",  # URL of your project repo
+    author="Caj Morgan",
     author_email="caj@maiosolutions.com",
     license="GPL-3.0",  # License type
     packages=find_packages(),  # Automatically find and include your packages

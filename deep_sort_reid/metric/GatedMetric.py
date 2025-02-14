@@ -6,7 +6,7 @@ from torch import Tensor
 import torch
 from deep_sort_reid.constants.tracker import GATING_THRESHOLD
 from deep_sort_reid.storage.CacheStorage import CacheStorage
-from deep_sort_reid.tracker.KalmanFilter import KalmanFilter
+from deep_sort_reid.models.motion.KalmanFilter import KalmanFilter
 from deep_sort_reid.tracker.Track import Track
 from deep_sort_reid.types.coords import CoordinatesXYAH
 from deep_sort_reid.types.detection import Detection
@@ -17,11 +17,12 @@ from deep_sort_reid.utils.box_methods import from_xyah_to_tensor, from_xyxy_to_x
 
 class GatedMetric(Metric):
 
-    def __init__(self, metric_type: MetricType, max_distance: float, cache_storage: CacheStorage, kf: KalmanFilter):
+    def __init__(self, metric_type: MetricType, max_distance: float, cache_storage: CacheStorage, kf: KalmanFilter, gated: bool = True):
         self.metric_type: MetricType = metric_type
         self.max_distance = max_distance
         self.cache_storage: CacheStorage = cache_storage
         self.kf: KalmanFilter = kf
+        self.gated: bool = gated
         # Distance usage -> f.e do we want min over s
 
     def __distance(self,
@@ -49,14 +50,11 @@ class GatedMetric(Metric):
             features.append(detection.feature)
 
         for track_idx, track in enumerate(tracks):
-            # self.cache_storage
-            # if cosine type
-
             if self.metric_type == 'cosine':
-                cost_matrix[track_idx, :] = self.__cosine_distance(
+                cost_matrix[track_idx, :] = self.cosine_distance(
                     self.cache_storage[track.track_id], features)
             elif self.metric_type == 'euclidean':
-                cost_matrix[track_idx, :] = self.__euclidean_distance(
+                cost_matrix[track_idx, :] = self.euclidean_distance(
                     self.cache_storage[track.track_id], features)
 
         cost_matrix = self.__gated(cost_matrix, tracks, measurements)
@@ -75,7 +73,8 @@ class GatedMetric(Metric):
 
         return cost_matrix
 
-    def __cosine_distance(self, samples: List[Tensor], features: List[Tensor]):
+    @staticmethod
+    def cosine_distance(samples: List[Tensor], features: List[Tensor]):
         samples_mat = torch.stack(samples)
         features_mat = torch.stack(features)
 
@@ -83,9 +82,11 @@ class GatedMetric(Metric):
         B = features_mat / torch.linalg.norm(features_mat, dim=1, keepdim=True)
 
         distances = torch.min((1 - (A @ B.T)), dim=0).values
+
         return distances
 
-    def __euclidean_distance(self, samples: List[Tensor], features: List[Tensor]):
+    @staticmethod
+    def euclidean_distance(samples: List[Tensor], features: List[Tensor]):
         samples_mat = torch.stack(samples)
         features_mat = torch.stack(features)
 
