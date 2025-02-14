@@ -19,6 +19,7 @@ from deep_sort_reid.tracker.Tracker import Tracker
 from deep_sort_reid.types.tracker import TrackResult
 from deep_sort_reid.types.detection import Detection
 from deep_sort_reid.types.metric import MetricType
+from pydantic import TypeAdapter
 
 
 class DeepSortReid():
@@ -51,6 +52,9 @@ class DeepSortReid():
 
     def track(self,
               detections: List[List[Detection]]):
+
+        detections = TypeAdapter(
+            List[List[Detection]]).validate_python(detections)
 
         kf = KalmanFilter()
         cache_storage = CacheStorage(self.max_samples_per_track)
