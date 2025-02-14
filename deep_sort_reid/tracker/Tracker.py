@@ -6,7 +6,7 @@ from deep_sort_reid.enums.tracker import TrackState
 from deep_sort_reid.metric.GatedMetric import GatedMetric
 from deep_sort_reid.metric.IouMetric import IouMetric
 from deep_sort_reid.storage.CacheStorage import CacheStorage
-from deep_sort_reid.tracker.KalmanFilter import KalmanFilter
+from deep_sort_reid.models.motion.KalmanFilter import KalmanFilter
 from deep_sort_reid.tracker.Track import Track
 from deep_sort_reid.types.detection import Detection
 from deep_sort_reid.utils.box_methods import from_xyxy_to_xyah
@@ -169,7 +169,7 @@ class Tracker():
             track_samples = None
 
             if track.track_id in self.cache_storage.samples:
-                track_samples = self.cache_storage[track.track_id]
+                track_samples = self.cache_storage.get(track.track_id, 'mean')
 
             if (track_samples is not None and detection.feature is not None):
                 # 1 - in order to transform it back to similarity from distance

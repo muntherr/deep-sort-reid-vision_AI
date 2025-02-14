@@ -14,7 +14,7 @@ from typing import List
 from deep_sort_reid.metric.GatedMetric import GatedMetric
 from deep_sort_reid.metric.IouMetric import IouMetric
 from deep_sort_reid.storage.CacheStorage import CacheStorage
-from deep_sort_reid.tracker.KalmanFilter import KalmanFilter
+from deep_sort_reid.models.motion.KalmanFilter import KalmanFilter
 from deep_sort_reid.tracker.Tracker import Tracker
 from deep_sort_reid.types.tracker import TrackResult
 from deep_sort_reid.types.detection import Detection

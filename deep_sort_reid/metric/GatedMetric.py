@@ -6,7 +6,7 @@ from torch import Tensor
 import torch
 from deep_sort_reid.constants.tracker import GATING_THRESHOLD
 from deep_sort_reid.storage.CacheStorage import CacheStorage
-from deep_sort_reid.tracker.KalmanFilter import KalmanFilter
+from deep_sort_reid.models.motion.KalmanFilter import KalmanFilter
 from deep_sort_reid.tracker.Track import Track
 from deep_sort_reid.types.coords import CoordinatesXYAH
 from deep_sort_reid.types.detection import Detection
@@ -17,11 +17,12 @@ from deep_sort_reid.utils.box_methods import from_xyah_to_tensor, from_xyxy_to_x
 
 class GatedMetric(Metric):
 
-    def __init__(self, metric_type: MetricType, max_distance: float, cache_storage: CacheStorage, kf: KalmanFilter):
+    def __init__(self, metric_type: MetricType, max_distance: float, cache_storage: CacheStorage, kf: KalmanFilter, gated: bool = True):
         self.metric_type: MetricType = metric_type
         self.max_distance = max_distance
         self.cache_storage: CacheStorage = cache_storage
         self.kf: KalmanFilter = kf
+        self.gated: bool = gated
         # Distance usage -> f.e do we want min over s
 
     def __distance(self,

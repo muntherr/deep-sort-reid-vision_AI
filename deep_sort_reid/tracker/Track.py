@@ -3,7 +3,7 @@
 from typing import List, Sequence
 from torch import Tensor
 from deep_sort_reid.enums.tracker import TrackState
-from deep_sort_reid.tracker.KalmanFilter import KalmanFilter
+from deep_sort_reid.models.motion.KalmanFilter import KalmanFilter
 from deep_sort_reid.types.coords import CoordinatesXYXY
 from deep_sort_reid.types.detection import Detection
 

@@ -8,16 +8,13 @@ from pydantic import TypeAdapter
 import torch
 from ultralytics import YOLO
 from deep_sort_reid.DeepSortReid import DeepSortReid
-from deep_sort_reid.enums.tracker import TrackState
 from deep_sort_reid.types.detection import Detection
 from deep_sort_reid.utils.detect_objects import detect_objects_yolo
-from deep_sort_reid.utils.extract_features import extract_features
+from deep_sort_reid.utils.extract_features import extract_features_resnet
 from deep_sort_reid.utils.misc import get_device
 from deep_sort_reid.utils.suppression import non_max_suppression
-from deep_sort_reid.torchreid.utils import FeatureExtractor
 
 curr_path = os.getcwd()
-
 file_input_path = curr_path + "/material/walking.mp4"
 
 device = get_device()
@@ -27,6 +24,7 @@ detections = detect_objects_yolo(file_input_path, model, model_params={
     "classes": [0],
     "iou": 0.7,
     "save": False,
+    "batch": 200,
     "conf": 0.3,
     "device": device
 })
@@ -54,14 +52,8 @@ detections = TypeAdapter(
 detections = non_max_suppression(
     detections, max_overlap=0.7, confidence_dependent=True)
 
-features_model = FeatureExtractor(
-    model_name='osnet_ain_x1_0',
-    device=device,
-    verbose=False
-)
-
-features = extract_features(
-    file_input_path, features_model, detections, verbose=True)
+features = extract_features_resnet(
+    file_input_path, detections, verbose=True)
 
 
 features_json = []
