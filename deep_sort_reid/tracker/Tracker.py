@@ -44,9 +44,44 @@ class Tracker():
         self.next_tracker_id = 1
 
     def __initiate_track(self, detection: Detection, track_id: int = -1):
+        # First try to find a match in the database
+        if detection.feature is not None and hasattr(self.cache_storage, 'search_topk'):
+            hits = self.cache_storage.search_topk(detection.feature, top_k=5)
+            if hits:
+                best_match = hits[0]
+                if best_match['distance'] > self.reid_similarity_score:
+                    new_track_id = best_match['track_id']
+                    state_mean, state_covariance = self.kf.initiate(
+                        from_xyxy_to_xyah(detection.coords))
+                    new_track = Track(
+                        state_mean,
+                        state_covariance,
+                        new_track_id,
+                        self.hits_until_confirm,
+                        self.max_since_update,
+                        detection.feature,
+                        detection.cls,
+                    )
+                    self.tracks.append(new_track)
+                    return
+
+        # If no match found or similarity too low, create new track
         new_track_id = self.next_tracker_id
         if track_id != -1:
             new_track_id = track_id
+
+        # Ensure this ID is not already in use in any camera
+        if hasattr(self.cache_storage, '_collection'):
+            while True:
+                expr = f'track_id == {new_track_id}'
+                res = self.cache_storage._collection.query(
+                    expr=expr,
+                    output_fields=["track_id"],
+                    limit=1
+                )
+                if not res:
+                    break
+                new_track_id += 1
 
         state_mean, state_covariance = self.kf.initiate(
             from_xyxy_to_xyah(detection.coords))
@@ -61,7 +96,7 @@ class Tracker():
         )
 
         self.tracks.append(new_track)
-        self.next_tracker_id += 1
+        self.next_tracker_id = max(self.next_tracker_id + 1, new_track_id + 1)
 
     def predict(self):
         for track in self.tracks:

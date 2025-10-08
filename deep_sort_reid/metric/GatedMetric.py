@@ -1,5 +1,3 @@
-
-
 from typing import List
 
 from torch import Tensor
@@ -29,7 +27,7 @@ class GatedMetric(Metric):
                    tracks: List[Track],
                    detections: List[Detection]) -> Tensor:
 
-        cost_matrix = torch.zeros((len(tracks)), len(detections))
+        cost_matrix = torch.zeros((len(tracks), len(detections)))
 
         if self.metric_type == 'iou':
             cost_matrix += torch.inf
@@ -38,24 +36,25 @@ class GatedMetric(Metric):
         features = []
         measurements: List[Tensor] = []
         for detection in detections:
-            # If features are disabled
-            # Might have to replace this with torch.zeros and use
-            # features dim from somewhere
             measurements.append(from_xyah_to_tensor(
                 from_xyxy_to_xyah(detection.coords)))
             if detection.feature is None:
                 features.append([])
                 continue
-
             features.append(detection.feature)
 
         for track_idx, track in enumerate(tracks):
+            track_features = self.cache_storage.get(track.track_id, "all")
+            if not track_features:  # If no features found for this track
+                cost_matrix[track_idx, :] = self.max_distance
+                continue
+
             if self.metric_type == 'cosine':
                 cost_matrix[track_idx, :] = self.cosine_distance(
-                    self.cache_storage[track.track_id], features)
+                    track_features, features)
             elif self.metric_type == 'euclidean':
                 cost_matrix[track_idx, :] = self.euclidean_distance(
-                    self.cache_storage[track.track_id], features)
+                    track_features, features)
 
         cost_matrix = self.__gated(cost_matrix, tracks, measurements)
         return cost_matrix
