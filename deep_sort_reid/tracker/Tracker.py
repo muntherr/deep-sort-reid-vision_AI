@@ -1,5 +1,4 @@
-
-
+import os
 from typing import List, Tuple
 
 from deep_sort_reid.enums.tracker import TrackState
@@ -43,6 +42,19 @@ class Tracker():
         self.deleted_tracks: List[Track] = []
         self.next_tracker_id = 1
 
+        # Optional: centralized global ID via Redis INCR
+        self._redis_client = None
+        self._redis_key = os.getenv('REDIS_GLOBAL_TRACK_KEY', 'vision:global_track_id')
+        redis_url = os.getenv('REDIS_URL', 'redis://127.0.0.1:6379/0')
+        try:
+            import redis  # type: ignore
+            self._redis_client = redis.Redis.from_url(redis_url, decode_responses=True)
+            # Test connection lightly
+            self._redis_client.ping()
+        except Exception:
+            # If Redis is unavailable, silently fall back to local counter
+            self._redis_client = None
+
     def __initiate_track(self, detection: Detection, track_id: int = -1):
         # First try to find a match in the database
         if detection.feature is not None and hasattr(self.cache_storage, 'search_topk'):
@@ -69,6 +81,26 @@ class Tracker():
         new_track_id = self.next_tracker_id
         if track_id != -1:
             new_track_id = track_id
+        elif self._redis_client is not None:
+            # Allocate from Redis atomically; ensure uniqueness against Milvus if present
+            while True:
+                try:
+                    candidate = int(self._redis_client.incr(self._redis_key))
+                except Exception:
+                    # On Redis error, fall back to local counter
+                    candidate = new_track_id
+
+                if hasattr(self.cache_storage, '_collection'):
+                    expr = f'track_id == {candidate}'
+                    res = self.cache_storage._collection.query(
+                        expr=expr,
+                        output_fields=["track_id"],
+                        limit=1
+                    )
+                    if res:
+                        continue
+                new_track_id = candidate
+                break
 
         # Ensure this ID is not already in use in any camera
         if hasattr(self.cache_storage, '_collection'):
